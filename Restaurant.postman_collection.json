@@ -1,0 +1,277 @@
+{
+	"info": {
+		"_postman_id": "7d8846f5-b04d-4be0-b41f-5d5990ae204f",
+		"name": "Restaurant",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9172739"
+	},
+	"item": [
+		{
+			"name": "Food Menu",
+			"item": [
+				{
+					"name": "All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3001/food-menu",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"food-menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find One",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3001/food-menu/4",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"food-menu",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kebab\",\n    \"price\": 7.22\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3001/food-menu",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"food-menu"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Kebab\",\n    \"price\": 7.21\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3001/food-menu/11",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"food-menu",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3001/food-menu/11",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"food-menu",
+								"11"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerEmail\": \"rasmad.ibnu@smartfinance.co.id\",\n    \"items\": [\n        {\n            \"foodMenuId\": 1,\n            \"quantity\": 2\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3001/orders",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inquiry",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerEmail\": \"rasmad.ibnu@smartfinance.co.id\",\n    \"items\": [\n        {\n            \"foodMenuId\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "localhost:3001/orders/7",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"orders",
+								"7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Kitchen",
+			"item": [
+				{
+					"name": "Pending",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerEmail\": \"rasmad.ibnu@smartfinance.co.id\",\n    \"items\": [\n        {\n            \"foodMenuId\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "localhost:3002/kitchen/orders/pending",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"kitchen",
+								"orders",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Processed",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerEmail\": \"rasmad.ibnu@smartfinance.co.id\",\n    \"items\": [\n        {\n            \"foodMenuId\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "localhost:3002/kitchen/orders/processed",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"kitchen",
+								"orders",
+								"processed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerEmail\": \"rasmad.ibnu@smartfinance.co.id\",\n    \"items\": [\n        {\n            \"foodMenuId\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "localhost:3002/kitchen/orders/7/complete",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"kitchen",
+								"orders",
+								"7",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
