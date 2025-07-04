@@ -1,0 +1,112 @@
+version: "3.8"
+
+services:
+  # Database
+  mysql:
+    image: mysql:8.0
+    container_name: restaurant_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: restaurant_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - restaurant_network
+
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: restaurant_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - restaurant_network
+
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order_service
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_DATABASE: restaurant_db
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - restaurant_network
+    volumes:
+      - ./order-service:/app
+      - /app/node_modules
+
+  # Kitchen Service
+  kitchen-service:
+    build:
+      context: ./kitchen-service
+      dockerfile: Dockerfile
+    container_name: kitchen_service
+    ports:
+      - "3002:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_DATABASE: restaurant_db
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - restaurant_network
+    volumes:
+      - ./kitchen-service:/app
+      - /app/node_modules
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification_service
+    ports:
+      - "3003:3000"
+    environment:
+      NODE_ENV: development
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: your-email@gmail.com
+      SMTP_PASS: your-app-password
+    depends_on:
+      - rabbitmq
+    networks:
+      - restaurant_network
+    volumes:
+      - ./notification-service:/app
+      - /app/node_modules
+
+networks:
+  restaurant_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  rabbitmq_data:

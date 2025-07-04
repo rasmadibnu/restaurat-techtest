@@ -1,0 +1,107 @@
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Inject,
+  forwardRef,
+} from "@nestjs/common";
+import * as amqp from "amqplib";
+import { RabbitmqConfig } from "../../config/rabbitmq.config";
+import { OrderEvent } from "../../common/interfaces/order-event.interface";
+import { KitchenService } from "../kitchen/kitchen.service";
+
+@Injectable()
+export class RabbitmqService implements OnModuleInit, OnModuleDestroy {
+  private connection: amqp.ChannelModel;
+  private channel: amqp.Channel;
+
+  constructor(
+    @Inject(forwardRef(() => KitchenService)) // 👈 inject using forwardRef
+    private readonly kitchenService: KitchenService
+  ) {}
+
+  async onModuleInit() {
+    await this.connect();
+    await this.setupQueue();
+    await this.startConsumer();
+  }
+
+  async onModuleDestroy() {
+    await this.disconnect();
+  }
+
+  private async connect() {
+    try {
+      this.connection = await amqp.connect(RabbitmqConfig.url);
+      this.channel = await this.connection.createChannel();
+      console.log("Kitchen Service connected to RabbitMQ");
+    } catch (error) {
+      console.error("Failed to connect to RabbitMQ:", error);
+      throw error;
+    }
+  }
+
+  private async setupQueue() {
+    try {
+      // Assert queue exists
+      await this.channel.assertQueue(RabbitmqConfig.queues.orderProcess, {
+        durable: true,
+      });
+      console.log("Kitchen Service queue setup completed");
+    } catch (error) {
+      console.error("Failed to setup queue:", error);
+      throw error;
+    }
+  }
+
+  private async startConsumer() {
+    try {
+      // Set prefetch to 1 to ensure fair distribution
+      await this.channel.prefetch(1);
+
+      // Start consuming messages
+      await this.channel.consume(
+        RabbitmqConfig.queues.orderProcess,
+        async (message) => {
+          if (message) {
+            try {
+              const orderEvent: OrderEvent = JSON.parse(
+                message.content.toString()
+              );
+              console.log(
+                "Kitchen Service received order:",
+                orderEvent.orderId
+              );
+
+              // Process the order
+              await this.kitchenService.processOrder(orderEvent);
+
+              // Acknowledge the message
+              this.channel.ack(message);
+            } catch (error) {
+              console.error("Error processing order message:", error);
+              // Reject the message and don't requeue
+              this.channel.reject(message, false);
+            }
+          }
+        },
+        { noAck: false }
+      );
+
+      console.log("Kitchen Service is listening for orders to process");
+    } catch (error) {
+      console.error("Failed to start consumer:", error);
+      throw error;
+    }
+  }
+
+  private async disconnect() {
+    try {
+      await this.channel?.close();
+      await this.connection?.close();
+      console.log("Kitchen Service disconnected from RabbitMQ");
+    } catch (error) {
+      console.error("Error disconnecting from RabbitMQ:", error);
+    }
+  }
+}
